@@ -1,0 +1,19 @@
+Tech with Tim
+    - Struktur Damspel
+        * Moduler & paket
+        * brädet
+            - pygame display, rutat
+            
+        * spelpjäser
+        * spel
+    - Checkers Bot
+
+Komma på själv: 
+    - Spelets startsida, options-meny (egen research)
+    - Val i options-menyn:
+        * Starta nytt spel
+            - Välja svårighetsgrad: dum AI, smart AI eller mot en vän (i options-menyn)
+            - Välja storlek på brädet: 8x8, 10x10 eller 12x12 (valet ska göras i en "options-meny" i spelets startsida)
+        * Visa highscore-lista
+    - Tidtagning och highscore-lista
+    - Random bot

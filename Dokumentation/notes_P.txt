@@ -1,0 +1,11 @@
+Programmera checkers
+https://www.youtube.com/watch?v=vnd3RfeG3NM&t=1526s
+
+programmera go-spelet
+https://www.youtube.com/watch?v=dHlan0bgr5U - youtube serie för go-spelet
+
+medium blog för schack-programmering
+https://medium.com/codex/how-to-code-a-simple-chess-game-in-python-9a9cb584f57
+
+Knight's tour
+https://en.m.wikipedia.org/wiki/Knight%27s_tour
