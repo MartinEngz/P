@@ -1,5 +1,5 @@
 import pygame
-from .constants import GRAY, SQUARE_SIZE, WHITE, CROWN
+from .constants import Constants
 
 class Piece():
     PADDING = 18
@@ -14,19 +14,17 @@ class Piece():
         self.calc_pos()
 
     def calc_pos(self):
-        self.x = SQUARE_SIZE * self.col + SQUARE_SIZE // 2
-        self.y = SQUARE_SIZE * self.row + SQUARE_SIZE // 2
+        self.x = Constants.SQUARE_SIZE * self.col + Constants.SQUARE_SIZE // 2
+        self.y = Constants.SQUARE_SIZE * self.row + Constants.SQUARE_SIZE // 2
 
     def make_king(self):
         self.king = True
 
     def draw(self, win):
-        radius = SQUARE_SIZE // 2 - self.PADDING
-        self.calc_pos()
-        pygame.draw.circle(win, GRAY, (self.x, self.y), radius)
+        radius = Constants.SQUARE_SIZE // 2 - self.PADDING
         pygame.draw.circle(win, self.color, (self.x, self.y), radius + self.OUTLINE)
         if self.king:
-            win.blit(CROWN, (self.x - CROWN.get_width()//2, self.y - CROWN.get_height()//2))
+            win.blit(Constants.CROWN, (self.x - Constants.CROWN.get_width()//2, self.y - Constants.CROWN.get_height()//2))
 
     def move(self, row, col):
         self.row = row

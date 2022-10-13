@@ -1,0 +1,16 @@
+Checkers highscore list
+
+Normal board (8x8)
+    1: [namn], [tid]
+    2: [namn], [tid]
+    ...
+
+Large board (10x10)
+    1: [namn], [tid]
+    2: [namn], [tid]
+    ...
+
+X Large board (12x12)
+    1: [namn], [tid]
+    2: [namn], [tid]
+    ...

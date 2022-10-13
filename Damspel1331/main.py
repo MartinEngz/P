@@ -1,30 +1,35 @@
 import pygame
-from checkers.constants import WIDTH, HEIGHT, SQUARE_SIZE
+from checkers.constants import Constants
 from checkers.game import Game
 
 
-FPS = 60
 
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption('Checkers')
 
 def get_row_col_from_mouse(pos):
     x, y = pos
-    row = y // SQUARE_SIZE
-    col = x // SQUARE_SIZE
+    row = y // Constants.SQUARE_SIZE
+    col = x // Constants.SQUARE_SIZE
     return row, col
 
 def main():
+
+    FPS = 60
+
+    WIN = pygame.display.set_mode((Constants.WIDTH, Constants.HEIGHT))
+    pygame.display.set_caption('Checkers')
+
     run = True
     clock = pygame.time.Clock()
     game = Game(WIN)
 
-    while run:
+    pygame.init()
+
+    while run: 
         clock.tick(FPS)
 
         if game.board.winner() != None:
+            # Freeze game, freeze clock, print time and board size to highscore list
             print(game.board.winner())
-            return True
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

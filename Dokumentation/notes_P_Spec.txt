@@ -1,4 +1,4 @@
-Tech with Tim
+Fixat
     - Struktur Damspel
         * Moduler & paket
         * brädet
@@ -6,9 +6,8 @@ Tech with Tim
             
         * spelpjäser
         * spel
-    - Checkers Bot
 
-Komma på själv: 
+Kvar: 
     - Spelets startsida, options-meny (egen research)
     - Val i options-menyn:
         * Starta nytt spel

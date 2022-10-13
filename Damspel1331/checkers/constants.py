@@ -1,13 +1,19 @@
 import pygame
 
-WIDTH, HEIGHT = 800, 800
-ROWS, COLS = 8, 8
-SQUARE_SIZE = WIDTH // COLS
+class Constants:
+    def __init__(self):
+        self.WIDTH = 700
+        self.HEIGHT = 800
+        self.ROWS, self.COLS = 10, 10
+        self.SQUARE_SIZE = self.WIDTH // self.COLS
 
-RED = (255, 0, 0)
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-BLUE = (0, 0, 255)
-GRAY = (122, 122, 122)
+        self.RED = (255, 0, 0)
+        self.BLACK = (0, 0, 0)
+        self.WHITE = (255, 255, 255)
+        self.BLUE = (0, 0, 255)
+        self.GRAY = (122, 122, 122)
+        self.YELLOW = (255, 255, 0)
 
-CROWN = pygame.transform.scale(pygame.image.load('assets/crown.png'), (45, 25))
+        self.CROWN = pygame.transform.scale(pygame.image.load('assets/crown.png'), (45, 25))
+
+Constants = Constants()
