@@ -10,7 +10,6 @@
         # botens moves: tech with tim 10:00
         #
         # skapa klassen Player??? 
-        # 
         # consider using research pygame.time.delay
         #
         # draw two radio buttons for playing against a bot or not (Constants attribute OPPONENT)
