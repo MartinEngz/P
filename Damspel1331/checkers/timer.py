@@ -47,7 +47,14 @@ class Timer:
     def reset(self):
         """
         Resets the timer by setting the value of t0 to the value of t1. Also resets the winner
-        time to None. 
+        time to None.
+
+        Modified instance variables:
+            self.t0: int
+                To visually reset the timer on the Pygame window, the value of self.t0 is set to 
+                the current value of self.t1
+            self.winner_time: NoneType
+                Reset to None in because when the timer restarts, a new game starts, which has no winner yet. 
         """
         self.t0 = self.t1
         self.winner_time = None
