@@ -8,7 +8,7 @@ Fixat
         * spel
 
 Kvar: 
-    - Spelets startsida, options-meny (egen research)
+    - Spelets startsida, options-meny
     - Val i options-menyn:
         * Starta nytt spel
             - Välja svårighetsgrad: dum AI, smart AI eller mot en vän (i options-menyn)
