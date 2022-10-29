@@ -4,7 +4,9 @@ from .piece import Piece
 
 class Board():
     """
-    The Board class creates and operates the board data structure.
+    Initialized from _set_starting_attributes() method in Game class instance. 
+    
+    The Board class creates and operates the board data structure. 
     """
     def __init__(self):
         """
@@ -145,11 +147,11 @@ class Board():
         textRect.center = (Constants.WIDTH//2, Constants.HEIGHT//2)
         window.blit(text, textRect)
 
-    def get_valid_steps(self, piece):
+    def get_valid_steps(self, piece) -> dict[tuple: list]:
         """
         Given a piece and with respect to the current state of the board, returns dictionary of its valid steps 
         (i.e moves that do not skip any opponent piece). This dictionary is a subset of the dictionary 
-        valid_paths from self.get_valid_paths-method.
+        valid_moves from self.get_valid_moves-method.
 
         Parameters:
             piece: Piece object
@@ -160,18 +162,14 @@ class Board():
                 Dictionary with keys of tuples, e.g (row, col), representing the destination row and column
                 of the valid steps. If the input piece can make valid steps, this dictionary will not be empty.
         """
-        valid_steps = {}
-        valid_paths = self.get_valid_paths(piece)
-        for (row, col) in valid_paths:
-            if len(valid_paths[(row, col)]) == 0:
-                valid_steps.update({(row, col): valid_paths[(row, col)]})
+        valid_steps = self.get_valid_moves(piece, get_skips=False)
         return valid_steps
 
-    def get_valid_skips(self, piece):
+    def get_valid_skips(self, piece) -> dict[tuple: list]:
         """
         Given a piece and with respect to the current state of the board, returns dictionary of its valid skips 
-        (i.e moves that skip an opponent piece). This dictionary is a subset of the dictionary valid_paths from
-        self.get_valid_paths-method.
+        (i.e moves that skip an opponent piece). This dictionary is a subset of the dictionary valid_moves from
+        self.get_valid_moves-method.
 
         Parameters:
             piece: Piece object
@@ -183,15 +181,11 @@ class Board():
                 of the valid skips. The value of a key will be a list containing the opponent piece that
                 was skipped over in order to move to the destination. 
         """
-        valid_skips = {}
-        valid_paths = self.get_valid_paths(piece)
-        for (row, col) in valid_paths:
-            if len(valid_paths[(row, col)]) == 1:
-                valid_skips.update({(row, col): valid_paths[(row, col)]})
+        valid_skips = self.get_valid_moves(piece, get_steps=False)
         return valid_skips
       
   
-    def get_valid_paths(self, piece):
+    def get_valid_moves(self, piece, get_steps=True, get_skips=True, recursive_skipping=False) -> dict[tuple: list]:
         """
         Returns a dictionary whose keys are all possible destination squares (row, col) and intermediary squares
         an input piece can move into during one turn. The value of a key will be a list whose elements are all 
@@ -200,105 +194,117 @@ class Board():
         Parameters:
             piece: Piece object
                 Piece to find valid paths for.
+            get_steps: bool 
+                OPTIONAL. Default value: True. Whether get_valid_moves() method is to consider moves of step size 1.
+            get_skips: bool
+                OPTIONAL. Default value: True. Whether get_valid_moves() method is to consider moves of step size 2.
+            recursive_skipping: bool
+                OPTIONAL. Default value: False. Boolean condition if recursion is to be used. As this is only desired 
+                for the bot calculating its longest possible move, recursion is set to False by default.
 
         Output:
-            valid_paths: dictionary
+            valid_moves: dictionary
                 Dictionary of all valid paths. Key is destination square and value is list of skipped pieces.  
         """
-        valid_paths = {}
-        left = piece.col - 1
-        right = piece.col + 1
-        row = piece.row
+        valid_moves = {}
+        if get_steps == True:
+            valid_moves.update(self.explore_valid_moves(piece, piece.row, piece.col, 1))
+        if get_skips == True:
+            valid_moves.update(self.explore_valid_moves(piece, piece.row, piece.col, 2, recursive_skipping=recursive_skipping))
 
-        if piece.color == Constants.PLAYER_COLOR or piece.king:
-            valid_paths.update(self._traverse_left(row-1, max(row-3, -1), -1, piece.color, left)) 
-            valid_paths.update(self._traverse_right(row-1, max(row-3, -1), -1, piece.color, right))
-        if piece.color == Constants.OPPONENT_COLOR or piece.king:
-            valid_paths.update(self._traverse_left(row+1, min(row+3, Constants.ROWS), 1, piece.color, left))
-            valid_paths.update(self._traverse_right(row+1, min(row+3, Constants.ROWS), 1, piece.color, right))
+        return valid_moves
+
+    def explore_valid_moves(self, piece, current_row, current_col, step_size, skip_path=[], recursive_skipping=False):
+        """
+        Explores valid moves for a piece by examining its four surrounding diagonal squares at a sitance of [step_size]
+        diagnonal squares away. If consecutive moves during the same turn is to be examined, the method calls itself
+        recursively. 
+
+        Parameters:
+            piece: Piece object
+                Piece to find valid moves for.
+            current_row: int
+                Starting row from which we want to find valid moves from.
+            current_col: int
+                Starting column from which we want to find valid moves from.
+            step_size: int
+                Distance a piece moves vertically respectively horisontally during a single move. A step has a step size
+                of 1 whereas a skip has a step size of 2. NOTE: Method only compatible with step_size 1 or 2.
+            skip_path: list
+                OPTIONAL. Default value: []. When the method calls itself recursively, keeping track of
+                which pieces has been skipped over is necessary in order to prevent the program from endlessly skipping
+                the same piece until the system recursion limit is met.
+            recursive skipping: bool
+                OPTIONAL. Default value: False. Whether the move finder method is to consider consecutive skip moves during 
+                the same turn. This is used by the BotMover class in order to calculate the longest possible move.
+
+        Output:
+            valid_moves: dictionary
+                Dictionary of all valid paths. Key is destination square and value is list of skipped pieces.  
+        """
+
+
+        up, down, left, right = [x + y * step_size for x in [current_row, current_col] for y in [-1, 1]]
+
+        valid_moves = {}
+
+        for target_row in [up, down]:
+            for target_col in [left, right]:
+                if not self.is_valid_move(piece, current_row, current_col, target_row, target_col, step_size):
+                    continue
+                else:
+                    if step_size == 1:
+                        valid_moves[target_row, target_col] = []
+                    else: # If step_size is not 1, step_size is 2. Then we check for skip moves. 
+                        skipped_row = (current_row + target_row) // 2
+                        skipped_col = (current_col + target_col) // 2
+                        if self.get_piece(skipped_row, skipped_col) in skip_path:
+                            continue
+                        new_skip_path = skip_path.copy()
+                        new_skip_path.append(self.get_piece(skipped_row, skipped_col))
+                        valid_moves[(target_row, target_col)] = new_skip_path
+                        if recursive_skipping == True: # Recursive skipping is used by BotMover instance for calculating longest possible move.
+                            valid_moves.update(self.explore_valid_moves(piece, target_row, target_col, 2, new_skip_path, recursive_skipping=True))
+        return valid_moves
+ 
+    def is_valid_move(self, piece, current_row, current_col, target_row, target_col, step_size) -> bool:
+        """
+        Set of logical conditions that has to be met in order for the move from current row and column to target
+        row and column to be valid.
+
+        Parameters:
+            piece: Piece Object
+                Piece to find valid moves for.
+            current_row, current_col: int, int
+                Current row and column where the piece is residing during the move. When the explore_valid_moves() 
+                method is called recursively, current row and column is in most cases not equivalent with the piece
+                object attributes piece.row and piece.col but a previous target row and target column.
+            target_row, target_col: int, int
+                Target row and column of the move being examined.
+            step_size: int
+                Distance a piece moves vertically respectively horisontally during a single move. A step has a step size
+                of 1 whereas a skip has a step size of 2.
         
-        # Propsosal for longest move finder "compatible with consecutive king moves in different
-        # directions".
-        # if last or first row in key_x of valid_paths:
-        #     run traverse algo in both directions
-        #     valid_paths.update(king_paths)
+        Output:
+            bool
+                True if move is valid. False if it is not.
 
-        return valid_paths
-
-    def _traverse_left(self, start, stop, step, color, left_col, skipped=[]):
         """
-        Algorithm for exploring the left diagonal for valid paths. If an opponent piece is skipped within the
-        first move (same as the previous piece was an opponent piece), the algorithm calls self._traverse_left()
-        and self._traverse_right() to check for possible double jumps. Then the same methods are called again
-        to check for triple, quadruple, quintiple jumps etc. if possible.
 
-        ** CONSIDER HAVING PIECE AS A PARAMETER FOR _TRAVERSE METHOD** and write logic depending on if the piece
-        is king or not
-        """
-        moves = {}
-        previous_opp_piece = []
-        for row_i in range(start, stop, step):
-            if left_col < 0:
-                break
-            
-            current_diagonal_piece = self.board[row_i][left_col]
-            if current_diagonal_piece == 0:
-                if skipped and not previous_opp_piece:
-                    break
-                elif skipped:
-                    moves[(row_i, left_col)] = previous_opp_piece + skipped
-                else:
-                    moves[(row_i, left_col)] = previous_opp_piece
-
-                if previous_opp_piece: # this if-block basically checks if double or triple jumps are possible, my program must ultimately expand to quadruple and quintiple jumps as well if the board is 12x12
-                    if step == -1:
-                        stop_from_row_i = max(row_i - 3, -1)
-                    else:
-                        stop_from_row_i = min(row_i + 3, Constants.ROWS)
-                    moves.update(self._traverse_left(row_i+step, stop_from_row_i, step, color, left_col-1, skipped=previous_opp_piece+skipped))
-                    moves.update(self._traverse_right(row_i+step, stop_from_row_i, step, color, left_col+1, skipped=previous_opp_piece+skipped))
-                    
-                break
-            elif current_diagonal_piece.color == color:
-                break
-            else:
-                previous_opp_piece = [current_diagonal_piece]
-
-            left_col -= 1
-
-        return moves
-
-    def _traverse_right(self, start, stop, step, color, right_col, skipped=[]):
-        moves = {}
-        previous_opp_piece = []
-        for row_i in range(start, stop, step):
-            if right_col >= Constants.COLS:
-                break
-            
-            current_diagonal_piece = self.board[row_i][right_col]
-            if current_diagonal_piece == 0:
-                if skipped and not previous_opp_piece:
-                    break
-                elif skipped:
-                    moves[(row_i, right_col)] = previous_opp_piece + skipped
-                else:
-                    moves[(row_i, right_col)] = previous_opp_piece
-
-                if previous_opp_piece: # this if-block basically checks if double or triple jumps are possible, my program must ultimately expand to quadruple and quintiple jumps as well if the board is 12x12
-                    if step == -1:
-                        stop_from_row_i = max(row_i - 3, -1)
-                    else:
-                        stop_from_row_i = min(row_i + 3, Constants.ROWS)
-                    
-                    moves.update(self._traverse_left(row_i+step, stop_from_row_i, step, color, right_col-1, skipped=previous_opp_piece+skipped))
-                    moves.update(self._traverse_right(row_i+step, stop_from_row_i, step, color, right_col+1, skipped=previous_opp_piece+skipped))
-                    
-                break
-            elif current_diagonal_piece.color == color:
-                break
-            else:
-                previous_opp_piece = [current_diagonal_piece]
-
-            right_col += 1
-
-        return moves
+        if not (piece.king or target_row == current_row + piece.direction * step_size):
+            # invalid direction
+            return False
+        if not (0 <= target_row < Constants.ROWS and 0 <= target_col < Constants.COLS):
+            return False
+        target_square = self.get_piece(target_row, target_col)
+        if target_square != 0:
+            # target_square not empty
+            return False
+        # all base obstacle conditions are overcome, the skipping case logic remains:
+        if step_size == 2:
+            skipped_row = (current_row + target_row) // 2
+            skipped_col = (current_col + target_col) // 2
+            skipped_piece = self.get_piece(skipped_row, skipped_col)
+            if skipped_piece == 0 or skipped_piece.color == piece.color:
+                return False
+        return True

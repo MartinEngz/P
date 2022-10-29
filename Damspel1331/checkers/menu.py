@@ -1,16 +1,19 @@
 import pygame
 
-from .highscore import Highscore_manager
+from .highscore import HighscoreManager
 from .constants import Constants
 from .radiobuttons import RadioButtons
  
 
 class Menu:
+    """
+    Initialized in the main function of the main file.
+
+    The menu class serves as the user interface for selecting game options, displaying time and
+    resetting the game during run time.
+    """
     def __init__(self, window, game, timer):
         """
-        The menu class serves as the user interface for selecting game options, displaying time and
-        resetting the game during run time.
-
         Parameters:
             window: Pygame Surfance object
                 window to draw menu on.
@@ -31,14 +34,14 @@ class Menu:
                 Dictionary of possible color choices.
             self.color_buttons: RadioButtons object
                 The Radiobuttons objects draws functional radiobuttons on the Pygame window for piece color selection.
-            self.bot_options: dictionary
-                Dictionary of bot alternatives represented as a boolean.
-            self.bot_buttons: Radiobuttons object
+            self.opponent_options: dictionary
+                Dictionary of opponent alternatives represented as a boolean.
+            self.opponent_buttons: Radiobuttons object
                 Functional radiobuttons for selecting to play against bot or not.
             self.has_updated_highscore: bool
                 Functions as a logical gatekeeper for updating highscore.
             self.filename: str
-                Path to file where highscore data will be written.
+                Path to file where highscore data will be written
         """
 
         self.window = window
@@ -48,8 +51,8 @@ class Menu:
         self.size_buttons = RadioButtons(window=self.window, caption='Board size:', options=self.board_size_options, default=Constants.BOARD_SIZE, top_left=(5, Constants.WIDTH+10))
         self.color_options = {'White': Constants.WHITE, 'Red': Constants.RED}
         self.color_buttons = RadioButtons(window=self.window, caption='Player color:', options=self.color_options, default=self.color_options['White'], top_left=(160, Constants.WIDTH+10)) 
-        self.bot_options = {'Friend': 'Friend', 'Bot': 'Bot'}
-        self.bot_buttons = RadioButtons(window=self.window, caption='Opponent:', options=self.bot_options, default=self.bot_options['Friend'], top_left=(450, Constants.WIDTH+10))
+        self.opponent_options = {'Friend': 'Friend', 'Bot': 'Bot'}
+        self.opponent_buttons = RadioButtons(window=self.window, caption='Opponent:', options=self.opponent_options, default=self.opponent_options['Friend'], top_left=(450, Constants.WIDTH+10))
         self.has_updated_highscore = False
         self.filename = 'Damspel1331/checkers/highscore.txt'        
 
@@ -63,7 +66,7 @@ class Menu:
         if self.game.board.winner():
             if self.has_updated_highscore == False:
                 new_score = self.set_time_format(self.timer.winner_time)
-                Highscore_manager(self.filename, self.size_buttons.selected, new_score)
+                HighscoreManager(self.filename, self.size_buttons.selected, new_score)
                 self.has_updated_highscore = True            
 
     def select(self, pos):
@@ -90,9 +93,9 @@ class Menu:
         if self.color_buttons.get_clicked_button(x, y):
             clicked_button = self.color_buttons.get_clicked_button(x, y)
             self.color_buttons.selected = clicked_button
-        if self.bot_buttons.get_clicked_button(x, y):
-            clicked_button = self.bot_buttons.get_clicked_button(x, y)
-            self.bot_buttons.selected = clicked_button 
+        if self.opponent_buttons.get_clicked_button(x, y):
+            clicked_button = self.opponent_buttons.get_clicked_button(x, y)
+            self.opponent_buttons.selected = clicked_button 
 
     def timer_is_clicked(self, x, y):
         """
@@ -123,7 +126,7 @@ class Menu:
         self.draw_turn()
         self.size_buttons.draw_buttons()
         self.color_buttons.draw_buttons()
-        self.bot_buttons.draw_buttons()
+        self.opponent_buttons.draw_buttons()
 
     def draw_timer(self):
         """
@@ -183,17 +186,18 @@ class Menu:
         pygame.draw.rect(self.window, Constants.GRAY, self.lower_boarder)
 
     def draw_turn(self):
-        if self.game.turn == Constants.PLAYER_COLOR:
+        if self.game.turn == Constants.PLAYER_COLOR :
             turn_str = '   Current turn: PLAYER   '
             turn_str_color = Constants.PLAYER_COLOR
         else:
             turn_str = 'Current turn: OPPONENT'
             turn_str_color = Constants.OPPONENT_COLOR
         if self.game.board.winner():
-            turn_str_color = Constants.BLACK
+            turn_str_color = Constants.BLACK # 
         turn_font = pygame.font.SysFont(None, 25)
         turn_text = turn_font.render(turn_str, 1, turn_str_color, Constants.BLACK)
         turn_text_rect = turn_text.get_rect(centerx=Constants.WIDTH//2, bottom=self.lower_boarder[1]-27)
+
         self.window.blit(turn_text, turn_text_rect)
 
 
@@ -203,9 +207,9 @@ class Menu:
         """
         self.window.fill(Constants.BLACK) # Upon restart, window is cleared by filling with black to 
                                           # erase any remainder of a previous board in the background.
-
         self.set_board_size()
         self.set_piece_colors()
+        self.set_opponent()
 
         self.game.reset()
         self.timer.reset()
@@ -242,5 +246,11 @@ class Menu:
             Constants.OPPONENT_COLOR = Constants.WHITE
         else:
             Constants.OPPONENT_COLOR = Constants.RED
+
+    def set_opponent(self):
+        if self.opponent_buttons.selected == 'Bot':
+            Constants.BOT_ACTIVE = True
+        elif self.opponent_buttons.selected == 'Friend':
+            Constants.BOT_ACTIVE = False
 
     

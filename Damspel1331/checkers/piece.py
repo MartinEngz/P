@@ -2,11 +2,14 @@ import pygame
 from .constants import Constants
 
 class Piece():
+    """
+    Piece instances are initialized in create_board() method of the board class.
+
+    Piece objects are the value of elements of the matrix representation of the board that
+    contain pieces.
+    """
     def __init__(self, row, col, color):
         """
-        Piece objects are the value of elements of the matrix representation of the board that
-        contain pieces.
-
         Instance variables initialized in the constructor:
             self.row, self.col: int, int
                 row and col represent the position of the piece on the checker board.
@@ -21,7 +24,18 @@ class Piece():
         self.col = col
         self.color = color
         self.king = False
+        self.set_direction()
         self.calc_pos()
+
+    def set_direction(self):
+        """
+        Sets which direction piece is to step or skip on the board. Is used in
+        the board method explore_valid_paths(). 
+        """
+        if self.color == Constants.PLAYER_COLOR:
+            self.direction = -1
+        else:
+            self.direction = 1
 
     def calc_pos(self):
         """

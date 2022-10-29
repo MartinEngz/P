@@ -1,12 +1,13 @@
 import pygame
 
 class Constants:
+    """
+    A collection of variables that are used at multiple locations in several modules. An instance of this class is
+    initilized in constants module such that the same instance of the class might be modified and dynamically used between 
+    different modules. 
+    """
     def __init__(self):
         """
-        A collection of useful variables that are used in multiple other modules. An instance of this object is
-        initilized module such that the same instance of the class might be modified and dynamically used
-        between different modules. 
-
         Initialized instance variables:
             self.RED: tuple
                 Used to draw color of red pieces and of red squares in Pygame window. Also used as a representation 
@@ -24,7 +25,8 @@ class Constants:
             self.WIDTH, self.HEIGHT: int, int
                 Width and height of Pygame window.
             self.BOARD_SIZE: tuple
-                Tuple representing board size in format (ROWS, COLUMNS)
+                Tuple representing board size in format (ROWS, COLUMNS). Possible to switch to any board size
+                where rows <= columns (only sizes where rows == columns is legal in checkers). Useful in debugging.
             self.ROWS, self.COLS: int, int
                 Amount of rows and columns retrieved from self.BOARD_SIZE tuple
             self.SQUARE_SIZE: int

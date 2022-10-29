@@ -1,14 +1,15 @@
 import pygame
 from .constants import Constants
 
-
-# create class RadioButtons __init__(self, caption, options, default) --> opponent_choice = RadioButtons(caption="BOT OR NOT", options=["BOT", "NOT"], default="NOT")
-        # self.temp_ROWS, self.temp_COLS = 8, 8 WRITE A METHOD AND A BUTTON FOR THIS
-
 class RadioButtons:
+    """
+    RadioButtons instances initialized in the constructor of the menu class.
+
+    Class for creating interactive radiobuttons.
+    """
+
     def __init__(self, window, caption, options, default, top_left):
         """
-        Self-made radiobuttons.
 
         Parameters:
             window: Pygame Surface object

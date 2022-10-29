@@ -1,12 +1,16 @@
-# Lägg till felhantering för att skapa filen highscore.txt om den inte finns
 
-class Highscore_manager:
+class HighscoreManager:
+    """
+    HighscoreManager instance is initialized in update() method of Menu class if menu.game has a winner. 
+    
+    If there is a winner in the game, the winner time and the current board size is passed 
+    to an instance of this class to update a txt file where each valid board size has its own highscore list. If the 
+    passed board size is invalid, no highscore list is updated. If there is no highscore file of txt format, the 
+    program calls a method for creating a txt file by a given template structure that is compatible with the sorting 
+    methods.
+    """
     def __init__(self, filename, board_size, new_score):
         """
-        If there is a winner in the game, the winner time and the current board size is passed to an instance of this
-        class to update a txt file where each valid board size has its own highscore list. If the passed board size is
-        invalid, no highscore list is updated. If there is no highscore file of txt format, the program calls a method
-        for creating a txt file by a given template structure that is compatible with the sorting methods.
 
         Parameters:
             filename: str
@@ -41,12 +45,15 @@ class Highscore_manager:
 
     def update_highscore(self):
         """
-        The highest-level method of updating highscore and runs according to the following workflow. First, 
-        the content of the txt file is converted into a list of three strings corresponding each highscore
-        list. Out of this list, the string containing the highscore list by relevant size is picked out 
-        together with its index in the list. The highscore list by size is modified by adding the new score
-        and sorting. The modified list is then replacing its pre-modified self in the list with all highscore
-        lists. This final list is then written to a target txt file.s
+        The highest-level method of updating highscore and runs according to the following workflow. 
+            - First, the content of the txt file is converted into a list of three strings corresponding 
+            each highscore list. 
+            - Out of this list, the string containing the highscore list by relevant size is picked out 
+            together with its index in the list. 
+            - The highscore list by size is modified by adding the new score and sorting. 
+            - The modified list is then replacing its original self in the list with all highscore
+            lists. 
+            - This final list is then written to a target txt file.
         """
         all_highscore_lists = self.txt_to_str_list() # FileNotFoundError if file does not exist
         idx, highscore_by_size = self.get_highscore_by_size(all_highscore_lists) # makes KeyError if input board_size does not have a hs list in txt file
@@ -69,7 +76,7 @@ class Highscore_manager:
         
     def get_highscore_by_size(self, all_hs_lists):
         """
-        From all__hs_lists, picks out the highscore list for relevant board size.
+        From all_hs_lists, picks out the highscore list for relevant board size.
 
         Parameters: 
             all_lists: list (of strings)
@@ -100,13 +107,16 @@ class Highscore_manager:
         rows = highscore_by_size.split('\n')
         rows = [row for row in rows if row]
         title = rows[0]
-        rows = rows[1:len(rows)+1] # removes first row with title: f"Highscore by size {board_size}"
+        rows = rows[1:len(rows)+1] # during sorting, exclude title row: f"Highscore by size {board_size}"
         for i, row in enumerate(rows):
             row = row.replace(" ", "").split("-")
             rows[i] = row[1]
         rows.append(self.new_score)
         rows.sort()
 
+        if len(rows) > 10:
+            rows = rows[0:10] # In order to not be excessive and unnecessarily long, each highscore list is
+                              # limited to ten elements, i.e a top ten list.
         for i, row in enumerate(rows):
             rows[i] = f"{i+1} - {row}"
         modified_highscore = title + '\n' + '\n'.join(rows) + '\n'
@@ -129,8 +139,8 @@ class Highscore_manager:
 
     def create_highscore_file(self):
         """
-        Creates the text file with the template structure compatible with the update highscore methods listed 
-        above. 
+        Creates the text file with the template structure compatible with the methods for updating the
+        highscore list.
         """
         template_str = ""
         for board_size in self.inv_board_size_options.values:
@@ -138,6 +148,3 @@ class Highscore_manager:
             template_str += f"Highscore by size {board_size}:\n\n"
         with open(self.filename, 'w') as file:
             file.write(template_str)
-
-# Useful for debugging: create test HighscoreManager with test board_size and test new_scoore 
-# Highscore_manager('Damspel1331/checkers/highscore.txt', (10, 10), '0:00:58')

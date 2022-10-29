@@ -1,26 +1,21 @@
 import pygame
 
 class Timer:
+    """
+    Initialized in the main function of the main file.
+
+    Timer class built using Pygame's time module. Used to keep track of time in the game.
+    """
     def __init__(self):
         """
-        Timer class built using Pygame's time module.
 
         Instance variables initialized and methods called in constructor:
             self.winner_time: int
                 Winner time in milliseconds. This is initialized to None.
-        """
-        self.winner_time = None
-        self.start_timer()
-          
-    def start_timer(self):
-        """
-        Starts timer. This method is called once only, before the start of the while loop of the
-        main function. Thus, the instance variable self.t0 is not continuously updated. 
-
-        Initialized/modified instance variables:
             self.t0: int
                 Measures time in milliseconds from that pygame.init() is called.
         """
+        self.winner_time = None
         self.t0 = pygame.time.get_ticks()
 
     def update_time(self):
@@ -51,10 +46,12 @@ class Timer:
 
         Modified instance variables:
             self.t0: int
-                To visually reset the timer on the Pygame window, the value of self.t0 is set to 
-                the current value of self.t1
+                To reset the timer on the Pygame window, the value of self.t0 is set to the current 
+                value of self.t1. This way pygame.init() does not have to be called again to reset 
+                the timer.
             self.winner_time: NoneType
-                Reset to None in because when the timer restarts, a new game starts, which has no winner yet. 
+                Winner_time is reset to None in because when the timer restarts, a new game starts, 
+                which has no winner yet. 
         """
         self.t0 = self.t1
         self.winner_time = None
